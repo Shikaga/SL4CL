@@ -24,15 +24,20 @@
    (while 
     (nil? (:exit @conn))
     (let [	msg (.readLine (:in @conn))
-			rttp-code (first (re-seq #"\w+" msg))]
+			split-message (re-seq #"\w+" msg)
+			rttp-code (first split-message)
+			message-body (rest split-message)]
       (println rttp-code)
       (cond 
        (re-find #"^ERROR :Closing Link:" msg) 
        (dosync (alter conn merge {:exit true}))
        (re-find #"^PING" msg)
        (write conn (str "PONG "  (re-find #":.*" msg)))
-	   (re-find #"1b" rttp-code)
-	   (println (str "FIELD LIST"))
+	   (re-find #"0o" rttp-code)
+	   (do 
+		(println (str "FIELD LIST"))
+		(dorun (map println message-body))
+		)
 	   ))))
 
  (defn login [conn]
