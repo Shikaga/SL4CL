@@ -48,6 +48,14 @@
 	)
 )
 
+(defn handle-container-not-found [head body]
+	(let [sequence-number (apply str (take 2 (drop 2 head)))
+		object-number (apply str (take 4 (drop 4 head)))]
+		;(def subject-list (assoc subject-list object-number subject-name))
+		(println "object number: " object-number " sequence number: " sequence-number)
+	)
+)
+
 (defn rttp-handler [msg]
 	(let [	split-message (split-by-space msg)
 			rttp-code (first split-message)
@@ -63,6 +71,8 @@
 		(handle-record-image rttp-code message-body)
 		(re-find #"6c" rttp-code)
 		(handle-record-update rttp-code message-body)
+		(re-find #"8c" rttp-code)
+		(handle-container-not-found rttp-code message-body)
 	   )
 	)
 ) 
@@ -71,12 +81,21 @@
 	(def connection (connect server rttp-handler))
 )
 
-(defn discard []
-	(write connection (str "000000 DISCARD /FX/USDGBP"))
+(defn discard [subject-name]
+	(write connection (str "000000 DISCARD " subject-name))
 )
 
-(defn request []
-	(write connection (str "000000 REQUEST /FX/USDGBP"))
+(defn discardX []
+	(discard "/FX/USDGBP")
+)
+
+(defn request [subject-name]
+	(write connection (str "000000 REQUEST " subject-name))
+)
+
+
+(defn requestCX []
+	(request "/FX/MAJOR")
 )
 
 (defn login []
