@@ -1,13 +1,11 @@
 # SL4Cl
 
-FIXME: write description
+StreamLink For Clojure is a Clojure implementation of the Caplin StreamLink API (see http://caplin.com/StreamLink.php)
 
 ## Usage
 
-FIXME: write
+Under Development
 
 ## License
 
-Copyright (C) 2011 FIXME
-
-Distributed under the Eclipse Public License, the same as Clojure.
+Copyright (C) Caplin Systems Ltd 2012
