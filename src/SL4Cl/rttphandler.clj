@@ -107,10 +107,6 @@
 	(write connection (str "000000 DISCARD " subject-name))
 )
 
-(defn discardX []
-	(discard "/FX/USDGBP")
-)
-
 (defn request [subject-name callback]
 	(write connection (str "000000 REQUEST " subject-name))
 	(add-callback subject-name callback)
