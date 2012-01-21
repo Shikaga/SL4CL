@@ -13,8 +13,7 @@
 	)
 	
 (defn requestX []
-	(request "/FX/USDGBP")
-	(add-callback user-callback-example)
+	(request "/FX/USDGBP" user-callback-example)
 )
 
 (connect-to liberator)

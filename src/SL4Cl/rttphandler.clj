@@ -6,7 +6,8 @@
 (def subject-list '{})
 (def connection)
 (def update-callbacks ())
-(defstruct record-update :name :fields)
+(defstruct record-update :subject-name :fields)
+(defstruct update-callback :subject-name :callback)
 
 (defn handle-field-list [body]
 	(let [split-list (map (fn [string] (split-by-equals string)) body)]
@@ -14,8 +15,8 @@
 	)
 )
 
-(defn add-callback [callback]
-	(def update-callbacks (cons callback update-callbacks))
+(defn add-callback [subject-name callback]
+	(def update-callbacks (cons (struct-map update-callback :subject-name subject-name :callback callback) update-callbacks))
 )
  		
 (defn replace-with-field-name [update-value]
@@ -23,17 +24,26 @@
 )
  
 (defn create-update-message [head body]
-	(let [name "DEMO_NAME"
+	(let [
+		sequence-number (apply str (take 2 (drop 2 head)))
+		object-number (apply str (take 4 (drop 4 head)))
+		subject-name (get subject-list object-number)
+		name subject-name
 		fields (map replace-with-field-name (map split-by-equals body))]
-		(println (str "HEAD: " head))
-		(struct-map record-update :name name :fields fields)
+		(println (str "SEQUENCE NUMBER: " sequence-number " OBJEct NUMBER " object-number))
+		(struct-map record-update :subject-name name :fields fields)
 	)
 )
 
 (defn handle-record-update [head body] 
 	(let [
-		update-vector (create-update-message head body)]
-		(doseq [x update-callbacks] (x update-vector))
+		update (create-update-message head body)]
+		(doseq [callback update-callbacks]
+			(println (str "callback " (get callback :subject-name) " update " (get update :subject-name)))
+			(if (= (get callback :subject-name) (get update :subject-name)) ;TODO: Make this compare the update-vector subject-name with the x :subject-name
+				((get callback :callback) update)
+			)
+		)
 	)
 ) 
 
@@ -56,6 +66,16 @@
 	)
 )
 
+(defn handle-3U [rttp-code message-body]
+	(let [	object-number (apply str (take 4 (drop 2 rttp-code)))
+		subject-name (first message-body)
+		fields (rest message-body)]
+		(def subject-list (assoc subject-list object-number subject-name))
+		(println rttp-code message-body)
+		(println (first message-body))
+	)
+)
+
 (defn rttp-handler [msg]
 	(let [	split-message (split-by-space msg)
 			rttp-code (first split-message)
@@ -73,6 +93,8 @@
 		(handle-record-update rttp-code message-body)
 		(re-find #"8c" rttp-code)
 		(handle-container-not-found rttp-code message-body)
+		(re-find #"3U" rttp-code)
+		(handle-3U rttp-code message-body)
 	   )
 	)
 ) 
@@ -89,8 +111,9 @@
 	(discard "/FX/USDGBP")
 )
 
-(defn request [subject-name]
+(defn request [subject-name callback]
 	(write connection (str "000000 REQUEST " subject-name))
+	(add-callback subject-name callback)
 )
 
 
