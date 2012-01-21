@@ -30,7 +30,6 @@
 		subject-name (get subject-list object-number)
 		name subject-name
 		fields (map replace-with-field-name (map split-by-equals body))]
-		(println (str "SEQUENCE NUMBER: " sequence-number " OBJEct NUMBER " object-number))
 		(struct-map record-update :subject-name name :fields fields)
 	)
 )
@@ -39,7 +38,6 @@
 	(let [
 		update (create-update-message head body)]
 		(doseq [callback update-callbacks]
-			(println (str "callback " (get callback :subject-name) " update " (get update :subject-name)))
 			(if (= (get callback :subject-name) (get update :subject-name)) ;TODO: Make this compare the update-vector subject-name with the x :subject-name
 				((get callback :callback) update)
 			)
@@ -71,8 +69,6 @@
 		subject-name (first message-body)
 		fields (rest message-body)]
 		(def subject-list (assoc subject-list object-number subject-name))
-		(println rttp-code message-body)
-		(println (first message-body))
 	)
 )
 
