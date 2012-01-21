@@ -64,7 +64,7 @@
 	)
 )
 
-(defn handle-3U [rttp-code message-body]
+(defn handle-record-response [rttp-code message-body]
 	(let [	object-number (apply str (take 4 (drop 2 rttp-code)))
 		subject-name (first message-body)
 		fields (rest message-body)]
@@ -90,7 +90,7 @@
 		(re-find #"8c" rttp-code)
 		(handle-container-not-found rttp-code message-body)
 		(re-find #"3U" rttp-code)
-		(handle-3U rttp-code message-body)
+		(handle-record-response rttp-code message-body)
 	   )
 	)
 ) 
