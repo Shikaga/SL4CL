@@ -180,9 +180,9 @@
 	  (if (empty? update-array)
 	    '()
 	    (do
-	      (log (str (first (first update-array)) " " (first (rest (first update-array)))))
+	      (js/updateObjectField (updates :subject-name) (first (first update-array)) (first (rest (first update-array))))
+	      ;(log (str (first (first update-array)) " " (first (rest (first update-array)))))
 	      (recur (rest update-array))
 	    )
 	  )
-	)
 )
